@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌊 Grade 12 Advanced Physics - Matter Waves & Uncertainty</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', sans-serif; }
+        body.en-mode { font-family: 'Inter', sans-serif; }
+        .correct { background-color: #dcfce7 !important; border-color: #16a34a !important; }
+        .incorrect { background-color: #fee2e2 !important; border-color: #dc2626 !important; }
+        .math { font-family: 'Times New Roman', serif; letter-spacing: 0.5px; direction: ltr; display: inline-block; font-style: italic; }
+        .timer-warning { color: #dc2626 !important; animation: pulse 1s infinite; }
+        @keyframes pulse { 50% { opacity: 0.7; } }
+        @media print { .no-print { display: none !important; } }
+        .success-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 0.875rem; }
+        .grade-excellent { background: #dcfce7; color: #166534; }
+        .grade-good { background: #fef3c7; color: #92400e; }
+        .grade-pass { background: #dbeafe; color: #1e40af; }
+        .grade-fail { background: #fee2e2; color: #991b1b; }
+        .lang-switch {
+            position: fixed; top: 16px; left: 16px; z-index: 100;
+            background: white; padding: 6px; border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15); display: flex; gap: 4px;
+            border: 2px solid #0d9488;
+        }
+        [dir="ltr"] .lang-switch { left: auto; right: 16px; }
+        .lang-btn {
+            padding: 6px 14px; border-radius: 20px; cursor: pointer; font-weight: bold;
+            transition: all 0.3s; border: none; font-size: 0.875rem;
+            background: transparent; color: #6b7280;
+        }
+        .lang-btn.active { background: #0d9488; color: white; box-shadow: 0 2px 6px rgba(13,148,136,0.4); }
+        .lang-btn:hover:not(.active) { background: #f0fdfa; color: #0d9488; }
+        .shuffle-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 p-4 md:p-8 min-h-screen">
+
+    <div class="lang-switch no-print">
+        <button class="lang-btn active" onclick="setLanguage('ar')" id="btn-ar">عربي</button>
+        <button class="lang-btn" onclick="setLanguage('en')" id="btn-en">EN</button>
+    </div>
+
+    <div id="timer-container" class="max-w-4xl mx-auto mb-4 text-center no-print">
+        <div class="bg-white p-4 rounded-xl shadow-md inline-block border-2 border-teal-100">
+            <span class="text-gray-600 ml-2" data-ar="️ الوقت المتبقي:" data-en="️ Time Remaining:">⏱️ الوقت المتبقي:</span>
+            <span id="timer" class="text-2xl font-bold text-teal-600 font-mono">60:00</span>
+            <span class="shuffle-badge" data-ar="🔀 أسئلة عشوائية" data-en="🔀 Random Questions"> أسئلة عشوائية</span>
+        </div>
+    </div>
+
+    <div class="max-w-4xl mx-auto mb-6 flex flex-wrap gap-3 justify-center no-print">
+        <button onclick="toggleAnswers()" class="bg-teal-600 hover:bg-teal-700 text-white px-5 py-2 rounded-lg font-medium transition shadow cursor-pointer" data-ar="👁️ إظهار / إخفاء الإجابات" data-en="👁️ Show / Hide Answers">👁️ إظهار / إخفاء الإجابات</button>
+        <button onclick="window.print()" class="bg-gray-800 hover:bg-gray-900 text-white px-5 py-2 rounded-lg font-medium transition shadow cursor-pointer" data-ar="🖨️ طباعة / PDF" data-en="🖨️ Print / PDF">🖨️ طباعة / PDF</button>
+        <button onclick="reshuffleExam()" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-5 py-2 rounded-lg font-medium transition shadow cursor-pointer" data-ar=" إعادة خلط الأسئلة" data-en="🔀 Reshuffle Questions">🔀 إعادة خلط الأسئلة</button>
+    </div>
+
+    <header class="max-w-4xl mx-auto bg-white p-6 rounded-xl shadow-md mb-8 border-r-4 border-teal-600">
+        <div class="text-center">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2" data-ar="🌊 فيزياء الصف الثاني عشر متقدم - Inspire" data-en="🌊 Grade 12 Advanced Physics - Inspire"> فيزياء الصف الثاني عشر متقدم - Inspire</h1>
+            <h2 class="text-lg text-teal-600 font-semibold" data-ar="الموجات المادية ومبدأ عدم اليقين" data-en="Matter Waves & Uncertainty Principle">الموجات المادية ومبدأ عدم اليقين</h2>
+            <p class="text-sm text-gray-600 mt-2" data-ar="فرضية دي برولي، نموذج بور، ازدواجية الموجة-الجسيم، ومبدأ هايزنبرج" data-en="De Broglie Hypothesis, Bohr Model, Wave-Particle Duality & Heisenberg Principle">فرضية دي برولي، نموذج بور، ازدواجية الموجة-الجسيم، ومبدأ هايزنبرج</p>
+            <p class="text-xs text-orange-600 mt-2 font-semibold" data-ar="⚠️ ملاحظة: يتم خلط ترتيب الأسئلة والخيارات تلقائياً مع كل تحديث للصفحة" data-en="⚠️ Note: Questions and options are randomly shuffled on every page refresh">⚠️ ملاحظة: يتم خلط ترتيب الأسئلة والخيارات تلقائياً مع كل تحديث للصفحة</p>
+        </div>
+        <div class="mt-4 flex flex-wrap justify-center gap-4 text-sm text-gray-600">
+            <span><span data-ar="📅 التاريخ:" data-en="📅 Date:"> التاريخ:</span> <input type="text" class="border-b border-gray-400 bg-transparent w-28 text-center"></span>
+            <span><span data-ar="👤 الاسم:" data-en="👤 Name:">👤 الاسم:</span> <input type="text" id="studentName" class="border-b border-gray-400 bg-transparent w-32 text-center" placeholder="Enter name"></span>
+            <span><span data-ar="🏫 الشعبة:" data-en="🏫 Class:">🏫 الشعبة:</span> <input type="text" id="studentClass" class="border-b border-gray-400 bg-transparent w-28 text-center" placeholder="Class"></span>
+            <span><span data-ar="️ المدة: 60 دقيقة" data-en="⏱️ Duration: 60 min">⏱️ المدة: 60 دقيقة</span></span>
+            <span><span data-ar="📊 المجموع: 100 درجة" data-en="📊 Total: 100 pts">📊 المجموع: 100 درجة</span></span>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto space-y-8" id="exam-content"></main>
+
+    <div class="text-center no-print pb-8 mt-8">
+        <button onclick="gradeExam()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-lg px-10 py-4 rounded-xl font-bold shadow-xl transition transform hover:scale-105 cursor-pointer" data-ar="📝 تسليم وتصحيح الامتحان" data-en="📝 Submit & Grade Exam">📝 تسليم وتصحيح الامتحان</button>
+    </div>
+
+    <div id="results-panel" class="max-w-4xl mx-auto mt-8 bg-white p-8 rounded-2xl shadow-2xl border-t-4 border-emerald-500 hidden no-print">
+        <h2 class="text-3xl font-bold text-gray-900 mb-6 text-center" data-ar="📊 نتائج الامتحان" data-en=" Exam Results">📊 نتائج الامتحان</h2>
+        <div class="grid md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-blue-50 p-4 rounded-xl text-center"><p data-ar="اسم الطالب" data-en="Student Name">اسم الطالب</p><p id="res-name" class="font-bold text-xl text-teal-700">-</p></div>
+            <div class="bg-purple-50 p-4 rounded-xl text-center"><p data-ar="التاريخ" data-en="Date">التاريخ</p><p id="res-date" class="font-bold text-xl text-purple-700">-</p></div>
+            <div class="bg-emerald-50 p-4 rounded-xl text-center"><p data-ar="المجموع" data-en="Score">المجموع</p><p id="res-total" class="font-bold text-3xl text-emerald-600">0 / 100</p></div>
+        </div>
+        <div class="text-center mb-6">
+            <span id="success-badge" class="success-badge grade-excellent">-</span>
+            <p id="success-percent" class="text-4xl font-bold text-emerald-600 mt-2">100%</p>
+            <p class="text-sm text-gray-500" data-ar="نسبة النجاح" data-en="Success Rate">نسبة النجاح</p>
+        </div>
+        <div class="bg-gray-50 p-6 rounded-xl mb-6">
+            <h3 class="font-bold text-lg mb-4 text-gray-800" data-ar="📈 تفصيل الأداء حسب القسم:" data-en="📈 Performance Breakdown:"> تفصيل الأداء حسب القسم:</h3>
+            <div class="space-y-3">
+                <div class="flex justify-between items-center"><span class="text-gray-700" data-ar="فرضية دي برولي" data-en="De Broglie Hypothesis">فرضية دي برولي</span><span id="sec1-score" class="font-bold text-teal-600">0/4</span></div>
+                <div class="flex justify-between items-center"><span class="text-gray-700" data-ar="نموذج بور الموجي" data-en="Bohr's Wave Model">نموذج بور الموجي</span><span id="sec2-score" class="font-bold text-teal-600">0/4</span></div>
+                <div class="flex justify-between items-center"><span class="text-gray-700" data-ar="ازدواجية الموجة-الجسيم" data-en="Wave-Particle Duality">ازدواجية الموجة-الجسيم</span><span id="sec3-score" class="font-bold text-teal-600">0/4</span></div>
+                <div class="flex justify-between items-center"><span class="text-gray-700" data-ar="مبدأ عدم اليقين لهايزنبرج" data-en="Heisenberg Uncertainty Principle">مبدأ عدم اليقين لهايزنبرج</span><span id="sec4-score" class="font-bold text-teal-600">0/4</span></div>
+                <div class="flex justify-between items-center"><span class="text-gray-700" data-ar="حسابات وتطبيقات" data-en="Calculations & Applications">حسابات وتطبيقات</span><span id="sec5-score" class="font-bold text-teal-600">0/4</span></div>
+            </div>
+        </div>
+        <div class="text-center mb-6">
+            <button id="sendEmailBtn" onclick="sendResultsToEmail()" class="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white text-lg px-8 py-3 rounded-xl font-bold shadow-xl transition transform hover:scale-105 cursor-pointer" data-ar=" إرسال النتائج للمعلم" data-en=" Send Results to Teacher">📧 إرسال النتائج للمعلم</button>
+            <p id="emailStatus" class="text-sm mt-2 text-center font-medium"></p>
+        </div>
+        <div class="flex gap-3 justify-center">
+            <button onclick="window.print()" class="bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold" data-ar="🖨️ طباعة النتائج" data-en="🖨️ Print Results">🖨️ طباعة النتائج</button>
+        </div>
+    </div>
+
+    <footer class="max-w-4xl mx-auto mt-10 mb-8 text-center text-gray-500 text-sm no-print">
+        © <span data-ar="الفيزياء للصف 12 متقدم - Inspire | الموجات المادية" data-en="Grade 12 Advanced Physics - Inspire | Matter Waves">الفيزياء للصف 12 متقدم - Inspire | الموجات المادية</span> | Mr. Mohammed Hesham
+    </footer>
+
+<script>
+// ==================== بيانات الامتحان الأصلية ====================
+const originalExamData = {
+    sections: [
+        {
+            id: 'sec1',
+            title: { ar: '🔹 الجزء الأول: فرضية دي برولي', en: '🔹 Part 1: De Broglie Hypothesis' },
+            questions: [
+                { q: { ar: 'ماذا اقترح لويس دي برولي عام 1924 بشأن الجسيمات المادية؟', en: 'What did Louis de Broglie propose in 1924 regarding material particles?' }, options: [{ ar: 'أنها تتصرف فقط ككرات بلياردو صلبة', en: 'They act only as solid billiard balls' }, { ar: 'أن لها خصائص موجية مرتبطة بحركتها', en: 'They have wave properties associated with their motion' }, { ar: 'أنها لا تحمل أي زخم', en: 'They carry no momentum' }, { ar: 'أنها تتحرك بسرعة ثابتة دائماً', en: 'They always move at constant speed' }], correct: 1, answer: { ar: 'اقترح دي برولي أن لكل جسيم متحرك طولاً موجياً مصاحباً له', en: 'De Broglie proposed that every moving particle has an associated wavelength' } },
+                { q: { ar: 'ما هي المعادلة التي تربط الطول الموجي لجسيم (λ) بزخمه (p)؟', en: 'What is the equation relating a particle\'s wavelength (λ) to its momentum (p)?' }, options: [{ ar: '<span class="math">λ = h / p</span>', en: '<span class="math">λ = h / p</span>' }, { ar: '<span class="math">λ = p / h</span>', en: '<span class="math">λ = p / h</span>' }, { ar: '<span class="math">λ = m v</span>', en: '<span class="math">λ = m v</span>' }, { ar: '<span class="math">λ = h p</span>', en: '<span class="math">λ = h p</span>' }], correct: 0, answer: { ar: 'علاقة دي برولي: λ = h/p أو λ = h/mv', en: 'De Broglie relation: λ = h/p or λ = h/mv' } },
+                { q: { ar: 'لماذا لا نلاحظ الطبيعة الموجية للأجسام الكبيرة مثل كرة القدم؟', en: 'Why do we not observe the wave nature of large objects like a soccer ball?' }, options: [{ ar: 'لأنها تتحرك ببطء شديد', en: 'Because they move too slowly' }, { ar: 'لأن كتلتها كبيرة جداً مما يجعل الطول الموجي قصيراً جداً وغير ملحوظ', en: 'Because their mass is huge, making the wavelength extremely short and negligible' }, { ar: 'لأنها لا تملك طاقة حركية', en: 'Because they have no kinetic energy' }, { ar: 'لأن ثابت بلانك يساوي صفراً في حالتها', en: 'Because Planck\'s constant is zero in their case' }], correct: 1, answer: { ar: 'الكتلة الكبيرة تجعل الطول الموجي (λ = h/mv) قصيراً جداً جداً، فلا يمكن ملاحظة تأثيراته', en: 'Large mass makes wavelength (λ = h/mv) incredibly short, so wave effects are unobservable' } },
+                { q: { ar: 'إذا زادت سرعة إلكترون، ماذا يحدث لطوله الموجي المصاحب له؟', en: 'If the speed of an electron increases, what happens to its associated wavelength?' }, options: [{ ar: 'يزداد', en: 'Increases' }, { ar: 'يبقى ثابتاً', en: 'Remains constant' }, { ar: 'يقل', en: 'Decreases' }, { ar: 'يصبح صفراً فوراً', en: 'Becomes zero immediately' }], correct: 2, answer: { ar: 'بما أن λ = h/mv، فالسرعة في المقام، إذن زيادة السرعة تؤدي لنقصان الطول الموجي', en: 'Since λ = h/mv, velocity is in the denominator, so increasing speed decreases wavelength' } }
+            ]
+        },
+        {
+            id: 'sec2',
+            title: { ar: '🔹 الجزء الثاني: نموذج بور الموجي', en: '🔹 Part 2: Bohr\'s Wave Model' },
+            questions: [
+                { q: { ar: 'كيف فسر دي برولي استقرار مدارات الإلكترون في ذرة بور؟', en: 'How did de Broglie explain the stability of electron orbits in Bohr\'s atom?' }, options: [{ ar: 'باعتبار الإلكترون موجة موقوفة (Standing Wave)', en: 'By considering the electron as a standing wave' }, { ar: 'باعتبار الإلكترون كوكب يدور حول الشمس فقط', en: 'By considering the electron as a planet orbiting the sun only' }, { ar: 'باعتبار النواة هي التي تتحرك', en: 'By considering the nucleus is moving' }, { ar: 'باعتبار الإلكترون جسيم ثابت', en: 'By considering the electron as a stationary particle' }], correct: 0, answer: { ar: 'المدار المسموح هو الذي يساوي محيطه عدداً صحيحاً من الأطوال الموجية للإلكترون', en: 'Allowed orbit is one where circumference equals an integer number of wavelengths' } },
+                { q: { ar: 'ما هو شرط تكميم الزخم الزاوي في نموذج بور؟', en: 'What is the quantization condition for angular momentum in Bohr\'s model?' }, options: [{ ar: '<span class="math">L = n h</span>', en: '<span class="math">L = n h</span>' }, { ar: '<span class="math">L = n (h/2π)</span>', en: '<span class="math">L = n (h/2π)</span>' }, { ar: '<span class="math">L = mv</span>', en: '<span class="math">L = mv</span>' }, { ar: '<span class="math">L = 0</span>', en: '<span class="math">L = 0</span>' }], correct: 1, answer: { ar: 'L = n(h/2π) حيث n عدد صحيح', en: 'L = n(h/2π) where n is an integer' } },
+                { q: { ar: 'ما العلاقة بين محيط مدار الإلكترون (2πr) وطوله الموجي (λ) في حالة الاستقرار؟', en: 'What is the relation between electron orbit circumference (2πr) and its wavelength (λ) in stability?' }, options: [{ ar: '<span class="math">2πr = nλ</span>', en: '<span class="math">2πr = nλ</span>' }, { ar: '<span class="math">2πr = λ/n</span>', en: '<span class="math">2πr = λ/n</span>' }, { ar: '<span class="math">πr = λ</span>', en: '<span class="math">πr = λ</span>' }, { ar: '<span class="math">2πr = n/λ</span>', en: '<span class="math">2πr = n/λ</span>' }], correct: 0, answer: { ar: 'يجب أن يحيط المدار عدداً صحيحاً من الموجات حتى لا تتداخل وتلغي بعضها', en: 'Orbit must contain an integer number of waves so they don\'t destructively interfere' } },
+                { q: { ar: 'ما الذي يحدث للإلكترون عند انتقاله من مدار بعيد إلى مدار أقرب للنواة؟', en: 'What happens to the electron when it transitions from a distant orbit to a closer one?' }, options: [{ ar: 'يمتص طاقة', en: 'Absorbs energy' }, { ar: 'يبعث فوتون (إشعاع ضوئي)', en: 'Emits a photon (radiates light)' }, { ar: 'يزداد طوله الموجي', en: 'Its wavelength increases' }, { ar: 'يتوقف عن الحركة', en: 'It stops moving' }], correct: 1, answer: { ar: 'الانتقال لمستوى طاقة أقل يصاحبه انبعاث فرق الطاقة على شكل فوتون', en: 'Transition to lower energy level is accompanied by emission of energy difference as a photon' } }
+            ]
+        },
+        {
+            id: 'sec3',
+            title: { ar: '🔹 الجزء الثالث: ازدواجية الموجة-الجسيم', en: '🔹 Part 3: Wave-Particle Duality' },
+            questions: [
+                { q: { ar: 'ما هي التجربة التي أثبتت أن الإلكترونات يمكن أن تحيد (Diffract)؟', en: 'What experiment proved that electrons can diffract?' }, options: [{ ar: 'تجربة رذرفورد', en: 'Rutherford experiment' }, { ar: 'تجربة دافيسون وجيرمر', en: 'Davisson and Germer experiment' }, { ar: 'تجربة قطرة الزيت لمليكان', en: 'Millikan oil drop experiment' }, { ar: 'تجربة الشق المزدوج للضوء فقط', en: 'Double slit experiment for light only' }], correct: 1, answer: { ar: 'تجربة دافيسون-جيرمر أظهرت حيود الإلكترونات على بلورة النيكل، مما أثبت طبيعتها الموجية', en: 'Davisson-Germer experiment showed electron diffraction on nickel crystal, proving wave nature' } },
+                { q: { ar: 'ماذا يعني مفهوم "ازدواجية الموجة-الجسيم"؟', en: 'What does the concept of "Wave-Particle Duality" mean?' }, options: [{ ar: 'أن الإلكترون نصف موجة ونصف جسيم', en: 'Electron is half wave and half particle' }, { ar: 'أن الإلكترون يمكن أن يظهر سلوك الموجة أو سلوك الجسيم اعتماداً على التجربة', en: 'Electron can exhibit wave behavior or particle behavior depending on the experiment' }, { ar: 'أن الضوء موجة فقط والإلكترون جسيم فقط', en: 'Light is only wave and electron is only particle' }, { ar: 'أن الإلكترون يتحول إلى موجة عندما ينام', en: 'Electron turns into a wave when it sleeps' }], correct: 1, answer: { ar: 'الازدواجية تعني أن الطبيعة يمكن أن تتصرف كموجة في بعض التجارب وكجسيم في تجارب أخرى', en: 'Duality means nature can behave as wave in some experiments and particle in others' } },
+                { q: { ar: 'في تجربة الشق المزدوج (Double Slit)، ماذا يحدث إذا أطلقنا الإلكترونات واحداً تلو الآخر؟', en: 'In the Double Slit experiment, what happens if we fire electrons one by one?' }, options: [{ ar: 'تتكون نقاط عشوائية فقط ولا يوجد نمط', en: 'Only random dots form with no pattern' }, { ar: 'تظهر تدريجياً نمط تداخل (أهداب مضيئة ومظلمة)', en: 'Interference pattern gradually emerges (bright and dark fringes)' }, { ar: 'الإلكترونات تصطدم بالشق وتعود', en: 'Electrons hit the slit and return' }, { ar: 'الإلكترون ينقسم لنصفين', en: 'Electron splits in half' }], correct: 1, answer: { ar: 'حتى مع إطلاق إلكترون واحد، يظهر نمط التداخل بمرور الوقت، مما يعني أن الإلكترون يتداخل مع نفسه', en: 'Even with single electrons, interference pattern emerges over time, meaning electron interferes with itself' } },
+                { q: { ar: 'ماذا يحدث لطبيعة الإلكترون إذا حاولنا قياس الشق الذي مر منه في تجربة الشق المزدوج؟', en: 'What happens to the electron\'s nature if we try to measure which slit it passed through in double slit experiment?' }, options: [{ ar: 'يبقى يتصرف كموجة', en: 'It continues to behave as a wave' }, { ar: 'يتصرف كجسيم ويختفي نمط التداخل', en: 'It behaves as a particle and interference pattern disappears' }, { ar: 'يتوقف عن الحركة', en: 'It stops moving' }, { ar: 'تزداد سرعته', en: 'Its speed increases' }], correct: 1, answer: { ar: 'مجرد محاولة القياس (الملاحظة) تدمر التراكب الموجي وتجبر الإلكترون على الظهور كجسيم', en: 'The mere act of measurement (observation) destroys the wave superposition and forces the electron to appear as a particle' } }
+            ]
+        },
+        {
+            id: 'sec4',
+            title: { ar: '🔹 الجزء الرابع: مبدأ عدم اليقين لهايزنبرج', en: '🔹 Part 4: Heisenberg Uncertainty Principle' },
+            questions: [
+                { q: { ar: 'ماذا ينص مبدأ عدم اليقين لهايزنبرج؟', en: 'What does Heisenberg\'s Uncertainty Principle state?' }, options: [{ ar: 'يمكننا معرفة الموقع والزخم بدقة لا نهائية', en: 'We can know position and momentum with infinite precision' }, { ar: 'لا يمكن تحديد الموقع والزخم لجسيم بدقة مطلقة في آن واحد', en: 'It is impossible to determine both position and momentum of a particle with absolute precision simultaneously' }, { ar: 'الإلكترون لا يمتلك موقعاً محدداً أبداً', en: 'Electron never has a specific position' }, { ar: 'السرعة دائماً غير مؤكدة', en: 'Speed is always uncertain' }], correct: 1, answer: { ar: 'هناك حد أساسي لمدى الدقة التي يمكننا بها معرفة زوجين من الخصائص المترابطة (مثل الموقع والزخم)', en: 'There is a fundamental limit to how precisely we can know certain pairs of properties (like position and momentum)' } },
+                { q: { ar: 'ما هي الصيغة الرياضية لمبدأ عدم اليقين (بشكل مبسط)؟', en: 'What is the mathematical formula for the Uncertainty Principle (simplified)?' }, options: [{ ar: '<span class="math">Δx Δp < h</span>', en: '<span class="math">Δx Δp < h</span>' }, { ar: '<span class="math">Δx Δp ≥ h/4π</span>', en: '<span class="math">Δx Δp ≥ h/4π</span>' }, { ar: '<span class="math">Δx + Δp = h</span>', en: '<span class="math">Δx + Δp = h</span>' }, { ar: '<span class="math">x p = h</span>', en: '<span class="math">x p = h</span>' }], correct: 1, answer: { ar: 'حاصل ضرب عدم اليقين في الموقع وعدم اليقين في الزخم أكبر من أو يساوي ثابتاً صغيراً جداً', en: 'Product of position uncertainty and momentum uncertainty is greater than or equal to a very small constant' } },
+                { q: { ar: 'إذا قمنا بتضييق الفتحة التي يمر منها الإلكترون (لتحديد موقعه بدقة)، ماذا يحدث لزخمه؟', en: 'If we narrow the slit an electron passes through (to pin down its position), what happens to its momentum?' }, options: [{ ar: 'يظل كما هو', en: 'Remains the same' }, { ar: 'يصبح غير مؤكد بشكل كبير (يتشتت)', en: 'Becomes highly uncertain (scatters)' }, { ar: 'يصبح صفراً', en: 'Becomes zero' }, { ar: 'يزداد بانتظام', en: 'Increases uniformly' }], correct: 1, answer: { ar: 'كلما قل عدم اليقين في الموقع (Δx صغير)، زاد عدم اليقين في الزخم (Δp كبير) والعكس صحيح', en: 'The smaller the position uncertainty (small Δx), the larger the momentum uncertainty (large Δp) and vice versa' } },
+                { q: { ar: 'هل ينطبق مبدأ عدم اليقين على الأجسام الكبيرة مثل السيارات؟', en: 'Does the Uncertainty Principle apply to large objects like cars?' }, options: [{ ar: 'لا ينطبق مطلقاً', en: 'Does not apply at all' }, { ar: 'ينطبق نظرياً، لكن تأثيره ضئيل جداً لا يمكن ملاحظته بسبب ضخامة الكتلة', en: 'Applies theoretically, but the effect is negligible and unobservable due to huge mass' }, { ar: 'ينطبق بشكل أكبر من الإلكترونات', en: 'Applies more than for electrons' }, { ar: 'يلغي الجاذبية', en: 'Cancels gravity' }], correct: 1, answer: { ar: 'المبدأ ينطبق على كل شيء، لكن قيمة h صغيرة جداً جداً، لذا التأثير يظهر فقط في العالم الكمي', en: 'Principle applies to everything, but h is very very small, so effect only shows in quantum world' } }
+            ]
+        },
+        {
+            id: 'sec5',
+            title: { ar: '🔹 الجزء الخامس: حسابات وتطبيقات', en: '🔹 Part 5: Calculations & Applications' },
+            questions: [
+                { q: { ar: 'أي الجسيمات التالية له أطول طول موجي (دي برولي) إذا كانت جميعها تتحرك بنفس السرعة؟', en: 'Which of the following particles has the longest De Broglie wavelength if all move at the same speed?' }, options: [{ ar: 'البروتون', en: 'Proton' }, { ar: 'الإلكترون', en: 'Electron' }, { ar: 'نيوترون', en: 'Neutron' }, { ar: 'جسم كتلته 1 كجم', en: '1 kg object' }], correct: 1, answer: { ar: 'λ = h/mv، بما أن السرعة ثابتة، فأصغر كتلة تعطي أطول طول موجي. كتلة الإلكترون هي الأصغر', en: 'λ = h/mv, since speed is constant, smallest mass gives longest wavelength. Electron mass is smallest' } },
+                { q: { ar: 'ما العلاقة بين الطول الموجي لإلكترون وفرق الجهد (V) الذي عُجِّل به؟', en: 'What is the relationship between an electron\'s wavelength and the accelerating voltage (V)?' }, options: [{ ar: '<span class="math">λ ∝ V</span>', en: '<span class="math">λ ∝ V</span>' }, { ar: '<span class="math">λ ∝ 1/√V</span>', en: '<span class="math">λ  1/√V</span>' }, { ar: '<span class="math">λ ∝ V</span>', en: '<span class="math">λ ∝ √V</span>' }, { ar: '<span class="math">λ ∝ V²</span>', en: '<span class="math">λ ∝ V²</span>' }], correct: 1, answer: { ar: 'زيادة فرق الجهد تزيد السرعة والطاقة، وبالتالي تقلل الطول الموجي. العلاقة عكسية مع الجذر التربيعي للجهد', en: 'Increasing voltage increases speed/energy, thus decreasing wavelength. Inverse relation with square root of voltage' } },
+                { q: { ar: 'إذا كان عدم اليقين في موقع إلكترون هو <span class="math">Δx</span>، فإن الحد الأدنى لعدم اليقين في سرعته (<span class="math">Δv</span>) يتناسب مع:', en: 'If position uncertainty of an electron is <span class="math">Δx</span>, the minimum uncertainty in its velocity (<span class="math">Δv</span>) is proportional to:' }, options: [{ ar: '<span class="math">Δx</span>', en: '<span class="math">Δx</span>' }, { ar: '<span class="math">1/Δx</span>', en: '<span class="math">1/Δx</span>' }, { ar: '<span class="math">(Δx)²</span>', en: '<span class="math">(Δx)²</span>' }, { ar: 'ثابت لا يعتمد على Δx', en: 'Constant independent of Δx' }], correct: 1, answer: { ar: 'Δx mΔv ≥ h/4π → Δv ≥ h/(4π m Δx) → Δv يتناسب عكسياً مع Δx', en: 'Δx mΔv ≥ h/4π → Δv ≥ h/(4π m Δx) → Δv is inversely proportional to Δx' } },
+                { q: { ar: 'لماذا تم استخدام حيود الإلكترونات (بدلاً من الضوء) لرؤية الذرات في المجاهر الإلكترونية؟', en: 'Why was electron diffraction used (instead of light) to see atoms in electron microscopes?' }, options: [{ ar: 'لأن الإلكترونات أرخص', en: 'Because electrons are cheaper' }, { ar: 'لأن الطول الموجي للإلكترون أقصر بكثير من الضوء المرئي، مما يعطي دقة (Resolution) أعلى', en: 'Because electron wavelength is much shorter than visible light, giving higher resolution' }, { ar: 'لأن الإلكترونات لا تحتاج لعدسات', en: 'Because electrons don\'t need lenses' }, { ar: 'لأن الضوء لا يحمل طاقة', en: 'Because light carries no energy' }], correct: 1, answer: { ar: 'الدقة تعتمد على الطول الموجي، والطول الموجي للإلكترونات قصير جداً مما يسمح برؤية تفاصيل دقيقة جداً', en: 'Resolution depends on wavelength, and electron wavelength is very short allowing very fine detail viewing' } }
+            ]
+        }
+    ]
+};
+
+// ==================== دالة الخلط (Fisher-Yates Shuffle) ====================
+function shuffleArray(array) {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+// ==================== تحضير البيانات مع الخلط ====================
+let examData;
+let correctAnswersMap = {}; // خريطة لتخزين الإجابة الصحيحة لكل سؤال بعد الخلط
+
+function prepareShuffledExam() {
+    // نسخ عميق للبيانات الأصلية
+    examData = JSON.parse(JSON.stringify(originalExamData));
+    correctAnswersMap = {};
+    
+    let globalIdx = 1;
+    
+    // خلط الأسئلة داخل كل قسم
+    examData.sections.forEach((section) => {
+        // خلط أسئلة القسم
+        section.questions = shuffleArray(section.questions);
+        
+        // خلط خيارات كل سؤال وتحديث الإجابة الصحيحة
+        section.questions.forEach((q) => {
+            // حفظ الخيارات الأصلية مع إشارتها (هل هي الإجابة الصحيحة؟)
+            const optionsWithCorrect = q.options.map((opt, idx) => ({
+                option: opt,
+                isCorrect: idx === q.correct
+            }));
+            
+            // خلط الخيارات
+            const shuffledOptions = shuffleArray(optionsWithCorrect);
+            
+            // تحديث الخيارات
+            q.options = shuffledOptions.map(o => o.option);
+            
+            // إيجاد موقع الإجابة الصحيحة الجديد
+            const newCorrectIndex = shuffledOptions.findIndex(o => o.isCorrect);
+            q.correct = newCorrectIndex;
+            
+            // تخزين الإجابة الصحيحة
+            correctAnswersMap[globalIdx] = String.fromCharCode(97 + newCorrectIndex);
+            globalIdx++;
+        });
+    });
+    
+    console.log('✅ تم خلط الأسئلة والخيارات بنجاح');
+    console.log('📋 الإجابات الصحيحة بعد الخلط:', correctAnswersMap);
+}
+
+// ==================== إعادة الخلط يدوياً ====================
+function reshuffleExam() {
+    prepareShuffledExam();
+    renderExam();
+    // مسح جميع الإجابات المحددة
+    document.querySelectorAll('input[type="radio"]:checked').forEach(r => r.checked = false);
+    // إخفاء لوحة النتائج إن كانت ظاهرة
+    document.getElementById('results-panel').classList.add('hidden');
+    // إزالة تلوين الأسئلة
+    document.querySelectorAll('.correct, .incorrect').forEach(el => {
+        el.classList.remove('correct', 'incorrect');
+    });
+    // إشعار للمستخدم
+    alert(currentLang === 'ar' 
+        ? '🔀 تم إعادة خلط الأسئلة والخيارات بنجاح!' 
+        : '🔀 Questions and options have been reshuffled successfully!');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ==================== متغيرات عامة ====================
+let currentLang = 'ar';
+let timeRemaining = 3600;
+let timerInterval;
+
+// ==================== تبديل اللغة ====================
+function setLanguage(lang) {
+    currentLang = lang;
+    document.documentElement.lang = lang;
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    document.getElementById('btn-ar').classList.toggle('active', lang === 'ar');
+    document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+    document.body.classList.toggle('en-mode', lang === 'en');
+    document.querySelectorAll('[data-ar][data-en]').forEach(el => {
+        el.textContent = el.getAttribute(`data-${lang}`);
+    });
+    renderExam();
+}
+
+// ==================== عرض الامتحان ====================
+function renderExam() {
+    const container = document.getElementById('exam-content');
+    const labels = {
+        ar: { option: ['أ', 'ب', 'ج', 'د'], answer: '✅ الإجابة:' },
+        en: { option: ['A', 'B', 'C', 'D'], answer: '✅ Answer:' }
+    };
+    const lbl = labels[currentLang];
+    const isRTL = currentLang === 'ar';
+
+    let html = '';
+    let globalIdx = 1;
+
+    examData.sections.forEach((section) => {
+        html += `<section class="bg-white p-6 rounded-xl shadow-lg">
+            <h2 class="text-xl font-bold mb-4 text-teal-700">${section.title[currentLang]}</h2>
+            <ol class="space-y-4 text-sm">`;
+
+        section.questions.forEach((q) => {
+            const borderSide = isRTL ? 'border-r-4 pr-4' : 'border-l-4 pl-4';
+            html += `<li class="${borderSide} border-teal-500 py-2" id="q-${globalIdx}">
+                <strong>${globalIdx}.</strong> ${q.q[currentLang]}<br>`;
+
+            q.options.forEach((opt, oIdx) => {
+                const radioSide = isRTL ? 'mr-4 ml-2' : 'ml-4 mr-2';
+                html += `<label class="cursor-pointer block mt-1 ${isRTL ? 'mr-4' : 'ml-4'}">
+                    <input type="radio" name="q${globalIdx}" value="${String.fromCharCode(97 + oIdx)}" class="${radioSide}">
+                    ${lbl.option[oIdx]}) ${opt[currentLang]}
+                </label>`;
+            });
+
+            html += `<div class="answer-box text-green-700 mt-2 font-medium hidden">
+                ${lbl.answer} ${lbl.option[q.correct]}) ${q.options[q.correct][currentLang]} — ${q.answer[currentLang]}
+            </div></li>`;
+            globalIdx++;
+        });
+
+        html += `</ol></section>`;
+    });
+
+    container.innerHTML = html;
+}
+
+// ==================== المؤقت ====================
+function startTimer() {
+    document.getElementById('timer-container').style.display = 'block';
+    timerInterval = setInterval(() => {
+        timeRemaining--;
+        const minutes = Math.floor(timeRemaining / 60);
+        const seconds = timeRemaining % 60;
+        const timerEl = document.getElementById('timer');
+        timerEl.textContent = `${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+        if (timeRemaining <= 300) timerEl.classList.add('timer-warning');
+        if (timeRemaining <= 0) {
+            clearInterval(timerInterval);
+            alert(currentLang === 'ar' ? "انتهى الوقت! سيتم تسليم الامتحان تلقائياً." : "Time's up!");
+            gradeExam();
+        }
+    }, 1000);
+}
+
+// ==================== إظهار/إخفاء الإجابات ====================
+function toggleAnswers() {
+    document.querySelectorAll('.answer-box').forEach(el => el.classList.toggle('hidden'));
+}
+
+// ==================== تصحيح الامتحان ====================
+function gradeExam() {
+    let correctCount = 0;
+    let sec1=0, sec2=0, sec3=0, sec4=0, sec5=0;
+
+    for (let i = 1; i <= 20; i++) {
+        const selected = document.querySelector(`input[name="q${i}"]:checked`);
+        const li = document.getElementById(`q-${i}`);
+        const correctAnswer = correctAnswersMap[i];
+        const isCorrect = selected && selected.value === correctAnswer;
+
+        if (isCorrect) {
+            correctCount++;
+            li.classList.add('correct');
+            li.classList.remove('incorrect');
+            if (i <= 4) sec1++;
+            else if (i <= 8) sec2++;
+            else if (i <= 12) sec3++;
+            else if (i <= 16) sec4++;
+            else sec5++;
+        } else {
+            li.classList.add('incorrect');
+            li.classList.remove('correct');
+        }
+    }
+
+    const score = (correctCount / 20) * 100;
+    const successRate = Math.round(score);
+
+    document.getElementById('res-total').textContent = `${Math.round(score)} / 100`;
+    document.getElementById('res-name').textContent = document.getElementById('studentName').value || (currentLang === 'ar' ? 'طالب' : 'Student');
+    document.getElementById('res-date').textContent = new Date().toLocaleDateString(currentLang === 'ar' ? 'ar-AE' : 'en-US');
+    document.getElementById('sec1-score').textContent = `${sec1}/4`;
+    document.getElementById('sec2-score').textContent = `${sec2}/4`;
+    document.getElementById('sec3-score').textContent = `${sec3}/4`;
+    document.getElementById('sec4-score').textContent = `${sec4}/4`;
+    document.getElementById('sec5-score').textContent = `${sec5}/4`;
+
+    const badge = document.getElementById('success-badge');
+    document.getElementById('success-percent').textContent = `${successRate}%`;
+
+    if (currentLang === 'ar') {
+        if (successRate >= 90) { badge.textContent = 'ممتاز'; badge.className = 'success-badge grade-excellent'; }
+        else if (successRate >= 75) { badge.textContent = 'جيد جداً'; badge.className = 'success-badge grade-good'; }
+        else if (successRate >= 50) { badge.textContent = 'جيد'; badge.className = 'success-badge grade-pass'; }
+        else { badge.textContent = 'يحتاج تحسين'; badge.className = 'success-badge grade-fail'; }
+    } else {
+        if (successRate >= 90) { badge.textContent = 'Excellent'; badge.className = 'success-badge grade-excellent'; }
+        else if (successRate >= 75) { badge.textContent = 'Very Good'; badge.className = 'success-badge grade-good'; }
+        else if (successRate >= 50) { badge.textContent = 'Good'; badge.className = 'success-badge grade-pass'; }
+        else { badge.textContent = 'Needs Improvement'; badge.className = 'success-badge grade-fail'; }
+    }
+
+    document.getElementById('results-panel').classList.remove('hidden');
+    document.getElementById('results-panel').scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('sendEmailBtn').classList.remove('hidden');
+}
+
+// ==================== إرسال النتائج بالإيميل ====================
+function sendResultsToEmail() {
+    const btn = document.getElementById('sendEmailBtn');
+    const status = document.getElementById('emailStatus');
+    btn.disabled = true;
+    btn.textContent = currentLang === 'ar' ? '⏳ جاري الإرسال...' : '⏳ Sending...';
+
+    const name = document.getElementById('studentName').value || 'N/A';
+    const studentClass = document.getElementById('studentClass').value || 'N/A';
+    const date = document.querySelector('input[type="text"]').value || new Date().toLocaleDateString();
+    const score = document.getElementById('res-total').textContent;
+    const successRate = document.getElementById('success-percent').textContent;
+    const badge = document.getElementById('success-badge').textContent;
+
+    const sectionNames = {
+        ar: ['فرضية دي برولي', 'نموذج بور الموجي', 'ازدواجية الموجة-الجسيم', 'مبدأ عدم اليقين', 'حسابات وتطبيقات'],
+        en: ['De Broglie Hypothesis', 'Bohr\'s Wave Model', 'Wave-Particle Duality', 'Uncertainty Principle', 'Calculations & Applications']
+    };
+    const currentSectionNames = sectionNames[currentLang];
+
+    let answersHTML = `
+        <div style="font-family: 'Segoe UI', Tahoma, Arial, sans-serif; direction: ${currentLang === 'ar' ? 'rtl' : 'ltr'};">
+            <div style="background: linear-gradient(135deg, #0d9488, #0891b2); color: white; padding: 20px; border-radius: 10px 10px 0 0; text-align: center;">
+                <h2 style="margin: 0; font-size: 22px;">🌊 ${currentLang === 'ar' ? 'نتيجة امتحان الموجات المادية' : 'Matter Waves Exam Result'}</h2>
+                <p style="margin: 5px 0 0 0; opacity: 0.9;">${currentLang === 'ar' ? 'الصف الثاني عشر متقدم - Inspire' : 'Grade 12 Advanced - Inspire'}</p>
+                <p style="margin: 5px 0 0 0; font-size: 12px; opacity: 0.8;">🔀 ${currentLang === 'ar' ? 'تم خلط الأسئلة تلقائياً' : 'Questions were randomly shuffled'}</p>
+            </div>
+            
+            <div style="background: #f0fdfa; padding: 15px; border: 1px solid #99f6e4;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="padding: 8px; font-weight: bold; color: #0f766e;">${currentLang === 'ar' ? '👤 الاسم:' : '👤 Name:'}</td>
+                        <td style="padding: 8px;">${name}</td>
+                        <td style="padding: 8px; font-weight: bold; color: #0f766e;">${currentLang === 'ar' ? '🏫 الشعبة:' : '🏫 Class:'}</td>
+                        <td style="padding: 8px;">${studentClass}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; font-weight: bold; color: #0f766e;">${currentLang === 'ar' ? '📅 التاريخ:' : '📅 Date:'}</td>
+                        <td style="padding: 8px;">${date}</td>
+                        <td style="padding: 8px; font-weight: bold; color: #0f766e;">${currentLang === 'ar' ? '🏆 التقدير:' : ' Grade:'}</td>
+                        <td style="padding: 8px;">${badge}</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="background: white; padding: 20px; text-align: center; border-bottom: 2px solid #e5e7eb;">
+                <div style="display: inline-block; margin: 0 15px;">
+                    <div style="font-size: 32px; font-weight: bold; color: #0d9488;">${score}</div>
+                    <div style="color: #6b7280; font-size: 13px;">${currentLang === 'ar' ? 'الدرجة الكلية' : 'Total Score'}</div>
+                </div>
+                <div style="display: inline-block; margin: 0 15px;">
+                    <div style="font-size: 32px; font-weight: bold; color: #059669;">${successRate}</div>
+                    <div style="color: #6b7280; font-size: 13px;">${currentLang === 'ar' ? 'نسبة النجاح' : 'Success Rate'}</div>
+                </div>
+            </div>
+
+            <h3 style="background: #f3f4f6; padding: 12px; margin: 0; color: #1f2937; border-bottom: 2px solid #d1d5db;">
+                📝 ${currentLang === 'ar' ? 'تفاصيل الإجابات' : 'Answer Details'}
+            </h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                <thead>
+                    <tr style="background: #0d9488; color: white;">
+                        <th style="padding: 10px; border: 1px solid #0b7d73; width: 8%;">#</th>
+                        <th style="padding: 10px; border: 1px solid #0b7d73; width: 32%;">${currentLang === 'ar' ? 'القسم' : 'Section'}</th>
+                        <th style="padding: 10px; border: 1px solid #0b7d73; width: 15%;">${currentLang === 'ar' ? 'الإجابة' : 'Answer'}</th>
+                        <th style="padding: 10px; border: 1px solid #0b7d73; width: 15%;">${currentLang === 'ar' ? 'الصحيحة' : 'Correct'}</th>
+                        <th style="padding: 10px; border: 1px solid #0b7d73; width: 15%;">${currentLang === 'ar' ? 'النتيجة' : 'Status'}</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    let sectionScores = [0, 0, 0, 0, 0];
+    let sectionTotals = [4, 4, 4, 4, 4];
+
+    for (let i = 1; i <= 20; i++) {
+        const selected = document.querySelector(`input[name="q${i}"]:checked`);
+        const selectedValue = selected ? selected.value : '-';
+        const correctValue = correctAnswersMap[i];
+        const isCorrect = selectedValue === correctValue;
+        
+        const sectionIndex = Math.floor((i - 1) / 4);
+        if (isCorrect) sectionScores[sectionIndex]++;
+
+        const rowBg = i % 2 === 0 ? '#f9fafb' : '#ffffff';
+        const statusBg = isCorrect ? '#dcfce7' : '#fee2e2';
+        const statusColor = isCorrect ? '#166534' : '#991b1b';
+        const statusIcon = isCorrect ? '✅' : '❌';
+        const statusText = isCorrect 
+            ? (currentLang === 'ar' ? 'صحيح' : 'Correct') 
+            : (currentLang === 'ar' ? 'خطأ' : 'Wrong');
+
+        answersHTML += `
+            <tr style="background: ${rowBg};">
+                <td style="padding: 8px; border: 1px solid #e5e7eb; text-align: center; font-weight: bold;">${i}</td>
+                <td style="padding: 8px; border: 1px solid #e5e7eb;">${currentSectionNames[sectionIndex]}</td>
+                <td style="padding: 8px; border: 1px solid #e5e7eb; text-align: center; font-weight: bold;">${selectedValue.toUpperCase()}</td>
+                <td style="padding: 8px; border: 1px solid #e5e7eb; text-align: center; font-weight: bold; color: #059669;">${correctValue.toUpperCase()}</td>
+                <td style="padding: 8px; border: 1px solid #e5e7eb; text-align: center; background: ${statusBg}; color: ${statusColor}; font-weight: bold;">
+                    ${statusIcon} ${statusText}
+                </td>
+            </tr>
+        `;
+    }
+
+    answersHTML += `
+                </tbody>
+            </table>
+
+            <h3 style="background: #f3f4f6; padding: 12px; margin: 0; color: #1f2937; border-bottom: 2px solid #d1d5db; border-top: 3px solid #0d9488;">
+                 ${currentLang === 'ar' ? 'تفصيل الأداء حسب القسم' : 'Performance Breakdown by Section'}
+            </h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                <thead>
+                    <tr style="background: #6366f1; color: white;">
+                        <th style="padding: 10px; border: 1px solid #4f46e5;">${currentLang === 'ar' ? 'القسم' : 'Section'}</th>
+                        <th style="padding: 10px; border: 1px solid #4f46e5; width: 20%;">${currentLang === 'ar' ? 'النتيجة' : 'Score'}</th>
+                        <th style="padding: 10px; border: 1px solid #4f46e5; width: 20%;">${currentLang === 'ar' ? 'النسبة' : 'Percentage'}</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    for (let i = 0; i < 5; i++) {
+        const percentage = Math.round((sectionScores[i] / sectionTotals[i]) * 100);
+        const barColor = percentage >= 75 ? '#10b981' : percentage >= 50 ? '#f59e0b' : '#ef4444';
+        const rowBg = i % 2 === 0 ? '#f9fafb' : '#ffffff';
+        
+        answersHTML += `
+            <tr style="background: ${rowBg};">
+                <td style="padding: 10px; border: 1px solid #e5e7eb; font-weight: 600;">${currentSectionNames[i]}</td>
+                <td style="padding: 10px; border: 1px solid #e5e7eb; text-align: center; font-weight: bold; color: #0d9488;">
+                    ${sectionScores[i]} / ${sectionTotals[i]}
+                </td>
+                <td style="padding: 10px; border: 1px solid #e5e7eb;">
+                    <div style="background: #e5e7eb; border-radius: 10px; overflow: hidden; height: 20px; position: relative;">
+                        <div style="background: ${barColor}; width: ${percentage}%; height: 100%; transition: width 0.5s;"></div>
+                        <span style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 11px; font-weight: bold; color: #1f2937;">
+                            ${percentage}%
+                        </span>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }
+
+    answersHTML += `
+                </tbody>
+            </table>
+
+            <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); padding: 15px; border-radius: 0 0 10px 10px; border-top: 2px solid #f59e0b;">
+                <p style="margin: 0; color: #78350f; text-align: center; font-size: 13px;">
+                     <strong>${currentLang === 'ar' ? 'ملاحظة:' : 'Note:'}</strong> 
+                    ${currentLang === 'ar' 
+                        ? 'تم إرسال هذا التقرير تلقائياً من منصة 4U التعليمية | Mr. Mohammed Hesham' 
+                        : 'This report was automatically sent from 4U Educational Platform | Mr. Mohammed Hesham'}
+                </p>
+            </div>
+        </div>
+    `;
+
+    const templateParams = {
+        to_email: "mohammedhesham872@gmail.com",
+        student_name: name,
+        student_class: studentClass,
+        exam_date: date,
+        total_score: score,
+        success_rate: successRate,
+        grade: badge,
+        answers_table: answersHTML
+    };
+
+    emailjs.send("service_w15m64i", "template_5b0u2tq", templateParams)
+        .then(() => {
+            status.textContent = currentLang === 'ar' 
+                ? '✅ تم إرسال النتائج بنجاح!' 
+                : '✅ Results sent successfully!';
+            status.style.color = '#059669';
+            btn.textContent = currentLang === 'ar' ? '✓ تم الإرسال' : '✓ Sent';
+        })
+        .catch(err => {
+            status.textContent = currentLang === 'ar' 
+                ? '❌ فشل الإرسال، حاول مرة أخرى' 
+                : '❌ Failed to send, try again';
+            status.style.color = '#dc2626';
+            btn.disabled = false;
+            btn.textContent = currentLang === 'ar' ? '📧 إعادة المحاولة' : '📧 Retry Send';
+            console.error('EmailJS Error:', err);
+        });
+}
+
+// ==================== التهيئة عند تحميل الصفحة ====================
+window.addEventListener('DOMContentLoaded', () => {
+    // تحضير الامتحان مع الخلط العشوائي
+    prepareShuffledExam();
+    
+    // عرض الامتحان
+    renderExam();
+    
+    // بدء المؤقت
+    startTimer();
+    
+    console.log('🔀 تم خلط الأسئلة والخيارات عشوائياً!');
+    console.log('📋 خريطة الإجابات الصحيحة:', correctAnswersMap);
+});
+</script>
+</body>
+</html>
